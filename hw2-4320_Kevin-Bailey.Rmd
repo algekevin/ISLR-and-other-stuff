@@ -1,0 +1,164 @@
+---
+title: "STA 4320 Homework 2"
+author: "Kevin Bailey"
+date: "9/15/18"
+output: html_document
+---
+
+# Question 2.4.10
+
+
+## Solution.
+
+### Part (a)
+
+```{r}
+library(MASS)
+# Boston
+# ?Boston
+# Commenting out the above two commands because > Boston just shows too much data for the output, and > ?Boston opens a different window for the Boston documentation. Could show head(Boston) but no real need for this answer.
+
+```
+This dataset has 506 rows and 14 columns. Each row represents a different housing value, perhaps housing values of areas. 
+
+
+### Part (b)
+
+```{r}
+par(mfrow=c(2,2))
+
+plot(Boston$ptratio, Boston$crim, main="Pupil to Teacher vs Crime", xlab="P:T Ratio", ylab="Crime Rate")
+
+plot(Boston$age, Boston$crim, main="House Age vs Crime", xlab="House Age", ylab="Crime")
+
+plot(Boston$tax, Boston$crim, main="Tax Rate vs Crime", xlab="Tax Rate", ylab="Crime")
+
+plot(Boston$age, Boston$tax, main="Tax Rate vs House Age", xlab="House Age", ylab="Tax Rate")
+```
+
+Looking at these four graphs, we can see some decent results.
+
+First, the crime rate seems to increase at the roughly 20 students per teacher ratio, as the crime rate very clearly spikes at that area. Lower student to teacher ratios show hardly any crime happening.
+
+Next, it seems clear that as the houses get older, their crime rate increases consistently. This means that crimes happen more often in older neighborhoods.
+
+We also check tax rate against crime rate, and see that higher tax rates seem to have higher crime rates as well, almost all around the 675 tax rate mark. 
+
+This made me want to check tax rate against house age as well, since we saw older housing had higher crime rates, and higher tax rates usually had higher crime rates as well. However, looking at tax rate vs house age, we see a large variety of points on the lower half of tax rate throughout *all* sorts of housing ages, with a heavier amount on the older houses. Though, when you look at the highest points of Tax Rate, we see the older houses being heavily shown in that area, with none of the houses within 40 years of age being shown at the high end of taxes.
+
+### Part (c)
+```{r}
+par(mfrow=c(2,4))
+
+# Starting at 2 to skip the initial predictor which results in Crime Rate vs Crime Rate
+
+for(c in 2:ncol(Boston))
+{
+  plot(Boston[,c], Boston$crim, xlab=colnames(Boston[c]), ylab="Crime Rate")
+}
+```
+
+There seem to be some clear relationships between crime rate and other predictors from the graphs above: 
+
+* #### House Age
+    + The older the house is, the higher the crime rate.
+
+* #### Distance to Employment Centres
+    + The lower the distance, the higher the crime rate.
+    
+* #### Pupil-to-Teacher Ratio
+    + Smaller numbers of students per teacher seem to have lower crime rates.
+    
+* #### Black
+    + Looks as if areas that are more black-dominant have higher crime rates.
+    
+* #### Median House Value
+    + The less a house costs, the more crime seems to happen. This is slightly consistent with house age, as older houses tend to cost less.
+
+### Part (d)
+
+Looking at Boston$crim with fix(data), we see a significant amount of suburbs with crime rates below 1.
+
+```{r}
+# produce 3 histograms
+par(mfrow=c(1,3))
+
+hist(Boston$crim[Boston$crim > 1], main="", xlab="Crime Rate > 1")
+
+hist(Boston$tax, main="", xlab="Tax Rate")
+
+hist(Boston$ptratio, main="", xlab="P:T Ratio")
+```
+
+#### Findings
+
+* High Crime Rates seem to be more frequent in a small amount of areas.
+
+* There seems to be a large gap in tax rates between the low end and high end, with the peak being in the high end.
+
+* A higher Pupil to Teacher Ratio is more frequent, with the peak being the same area where crime and P:T Ratio's relationship peaks as well.
+
+### Part (e)
+
+```{r}
+
+length(which(Boston$chas == 1))
+
+```
+
+So there are 35 suburbs in this data set that bound the Charles River.
+
+### Part (f)
+
+```{r}
+median(Boston$ptratio)
+```
+
+The median pupil to teacher ratio in this data set is 19.05.
+
+### Part (g)
+
+```{r}
+Boston[which(Boston$medv == min(Boston$medv)),]
+
+# Not sure how to print the mean of each predictor in one line without a different library and I'm not sure if we can use any others than as instructed. Using summary(Boston) could work but looks a bit messier to me. Still a good option though, I just wanted to mess around a bit.
+
+for(c in 1:ncol(Boston))
+{
+    cat(sprintf("Mean of %s: %f\n", colnames(Boston[c]), mean(Boston[,c], na.rm=T)))
+}
+```
+
+As we can see from the outputs above, the crime rates in these areas are decently high and the houses are on the extreme end of age. These houses are below the mean distance to employment centres as well. Crime rate may be high but there are some decent factors such as the low prices. I wouldn't choose to live here though.
+
+### Part (h)
+
+```{r}
+length(which(Boston$rm > 7))
+length(which(Boston$rm > 8))
+```
+
+There are 64 suburbs of Boston with more than 7 rooms per dwelling, and 13 suburbs with more than 8 rooms per dwelling.
+
+```{r}
+Boston[which(Boston$rm > 8),]
+
+# Using summary for comparison this time just to see how both go.
+summary(Boston)
+```
+
+Without aggregating the means of each column again and just glancing at this small subset, we can see that the crime rate of the 13 suburbs is lower than average by a good chunk(aside from the last suburb being slightly lower). 
+
+None of these suburbs reach the 9 room per dwelling mark, and the last suburb of this subset seems to have some outlier data entries among the other 12: 
+
+* Tax rate much higher
+
+* Nitrogen oxides concentrations are much higher
+
+* Significantly larger index of accessibility to radial highways
+
+* One of the two clearly industrial areas 
+
+* Has the lowest median house value of the 13 suburbs of interest
+
+* Far higher crimerate than the others in this subset
